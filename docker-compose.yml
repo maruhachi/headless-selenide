@@ -1,0 +1,22 @@
+version: '3'
+services:
+    db:
+        image: "postgres:10.1"
+        ports:
+          - "5432:5432"
+    app:
+        image: "myapp/springboot"
+        environment:
+          - SPRING_PROFILE_ACTIVE=selenium
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/uitest
+        ports:
+          - "8080:8080"
+        depends_on: db
+    chrome:
+        image: "yukinying/chrome-headless-browser-selenium:latest"
+        ports:
+          - "4444:4444"
+        environments:
+          - POSTGRES_PASSWORD=postgres
+          - POSTGRES_USER=postgres
+        depends_on: app
