@@ -1,24 +1,35 @@
-version: '3'
+version: '2'
 services:
     db:
+        container_name: db
         image: "postgres:9"
         ports:
-          - "5432:5432"
+          - "5433:5432"
         environment:
           - POSTGRES_DB=blogdb
           - POSTGRES_USER=postgres
           - POSTGRES_PASSWORD=postgres
-          - POSTGRES_INITDB_ARGS="--encoding=UTF-8 --locale=ja_JP.UTF-8"
+        networks:
+          - app_nw
     app:
-        image: "myapp/springboot"
+        container_name: app
+        image: "maruhachi/headless-chrome-selenide:latest"
         environment:
-          - SPRING_PROFILE_ACTIVE=selenium
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/uitest
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5433/blogdb
         ports:
           - "8080:8080"
-        depends_on: db
+        networks:
+          - app_nw
+        depends_on: 
+          - db
     chrome:
+        container_name: chrome
         image: "yukinying/chrome-headless-browser-selenium:latest"
         ports:
           - "4444:4444"
-        depends_on: app
+        networks:
+          - app_nw
+        depends_on:
+          - app
+networks:
+  app_nw:
